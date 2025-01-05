@@ -40,21 +40,22 @@ def filter_titles(priors, current_title):
     return result
 
 def get_arxiv_feed(priors):
-    with libreq.urlopen('http://export.arxiv.org/api/query?search_query=cat:cs.lg&sortBy=lastUpdatedDate&sortOrder=descending&&max_results=5') as url:
+    with libreq.urlopen('http://export.arxiv.org/api/query?search_query=cat:cs.ai&sortBy=submittedDate&sortOrder=descending&&max_results=5') as url:
         r = url.read()
     data = []
     feed = feedparser.parse(r)
 
     for entry in feed.entries:
-        if entry.arxiv_primary_category['term'] == 'cs.LG' and not filter_titles(priors, entry.title):
+        if entry.arxiv_primary_category['term'] in ['cs.LG', 'cs.AI', 'cs.CL'] and not filter_titles(priors, entry.title):
             data.append(entry.title)
             data.append(entry.summary)
             data.append(entry.link)
+            data.append(entry.published_parsed)
             return data
 
     return 42
 
-def post_to_twitter(auth, message):
+def post_to_twitter(auth, message, data):
     url = "https://api.twitter.com/2/tweets"
     headers = {
     'Content-Type': 'application/json',
@@ -67,7 +68,7 @@ def post_to_twitter(auth, message):
     if response.status_code == 201:
         time.sleep(5)
         reply_object = json.loads(response.text)
-        reply = json.dumps({"text": 'Title: '+ data[0] + ' \n\nLink to paper: '+ data[2], "reply": {"in_reply_to_tweet_id": reply_object['data']['id']}})
+        reply = json.dumps({"text": 'Title: '+ data[0] + ' \n\nPublished: ' + time.strftime("%Y-%m-%d", data[3]) + '\n\nLink to paper: '+ data[2], "reply": {"in_reply_to_tweet_id": reply_object['data']['id']}})
         response = requests.request("POST", url, headers=headers, data=reply, auth=auth)
         print('reply tweet: ', response.status_code, response.headers)
 
@@ -96,7 +97,7 @@ def main():
         )
 
         if message.content[0].text != None:
-            post_to_twitter(auth, message)
+            post_to_twitter(auth, message, data)
 
 if __name__ == '__main__':
     main()
