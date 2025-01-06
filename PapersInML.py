@@ -33,7 +33,7 @@ def get_prior_tweets(auth):
 def filter_titles(priors, current_title):
     data = json.loads(priors)['data']
     result = any(
-        current_title in t['text'][6:].strip()
+        current_title in ' '.join(t['text'][6:].split())
         for t in data 
         if t['text'].startswith("Title:")
     )
@@ -46,8 +46,8 @@ def get_arxiv_feed(priors):
     feed = feedparser.parse(r)
 
     for entry in feed.entries:
-        if entry.arxiv_primary_category['term'] in ['cs.LG', 'cs.AI', 'cs.CL'] and not filter_titles(priors, entry.title):
-            data.append(entry.title)
+        if entry.arxiv_primary_category['term'] in ['cs.LG', 'cs.AI', 'cs.CL'] and not filter_titles(priors, ' '.join(entry.title.split())):
+            data.append(' '.join(entry.title.split()))
             data.append(entry.summary)
             data.append(entry.link)
             data.append(entry.published_parsed)
