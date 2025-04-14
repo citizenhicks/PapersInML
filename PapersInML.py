@@ -75,10 +75,16 @@ def post_to_twitter(auth, message, data):
 def main():
     auth = connect_to_oauth(consumer_key, consumer_secret, access_token, access_token_secret)
     priors = get_prior_tweets(auth)
-    if priors.status_code != 200:
-        print('api error: ', priors.status_code)
+
+    if priors.status_code == 200:
+       prior_text = priors.text
+    elif priors.status_code == 429:
+        print("Rate limit hit (429). Skipping prior tweet filtering.")
+        prior_text = None
+    else:
+        print(f"API error: status code {priors.status_code}. Stopping execution.")
         return
-    data = get_arxiv_feed(priors.text)
+    data = get_arxiv_feed(prior_text)
 
     if data == 42:
         print('no new papers')
