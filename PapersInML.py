@@ -31,6 +31,8 @@ def get_prior_tweets(auth):
     return response
 
 def filter_titles(priors, current_title):
+    if priors == None:
+        return False 
     data = json.loads(priors)['data']
     result = any(
         current_title in ' '.join(t['text'][6:].split())
@@ -104,6 +106,7 @@ def main():
 
         if message.content[0].text != None:
             post_to_twitter(auth, message, data)
+    return
 
 if __name__ == '__main__':
     main()
