@@ -96,7 +96,7 @@ def main():
         prompt = f"""Summarize the given text in a short format maximum 280 characters. ONLY OUTPUT THE SUMMARY AND NOTHING ELSE:
         Text to summarize: {data}"""
         message = client.messages.create(
-            model="claude-3-5-haiku-latest",
+            model="claude-haiku-4-5-20251001",
             max_tokens=280,
             temperature=0.5,
             messages=[
