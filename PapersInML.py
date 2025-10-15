@@ -93,11 +93,11 @@ def main():
         return
     else:
         client = anthropic.Anthropic(api_key=os.getenv('CLAUDE_API'))
-        prompt = f"""Summarize the given text in a short format maximum 280 characters. ONLY OUTPUT THE SUMMARY AND NOTHING ELSE:
-        Text to summarize: {data}"""
+        prompt = f"""Summarize the given text in a short format MAXIMUM 280 characters or 50 tokens. It is critical that your summary does not exceed 280 characters or 50 tokens. ONLY OUTPUT THE SUMMARY AND NOTHING ELSE:
+        Text to summarize: {data"""
         message = client.messages.create(
             model="claude-haiku-4-5-20251001",
-            max_tokens=280,
+            max_tokens=50,
             temperature=0.5,
             messages=[
                 {"role": "user", "content": prompt}
